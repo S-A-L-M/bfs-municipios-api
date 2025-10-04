@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
-from src.services.graph_service import graph_service
+from services.graph_service import graph_service
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+routes_graph = Blueprint("routes_graph",__name__, url_prefix='/api')
 
-@api_bp.route('/health', methods=['GET'])
+@routes_graph.route('/health', methods=['GET'])
 def health():
     """Health check"""
     return jsonify({
@@ -11,7 +11,7 @@ def health():
         'status': 'ok'
     })
 
-@api_bp.route('/crear-grafo', methods=['POST'])
+@routes_graph.route('/crear-grafo', methods=['POST'])
 def crear_grafo():
     """
     Crea el grafo con las conexiones enviadas
@@ -59,7 +59,7 @@ def crear_grafo():
             'error': str(e)
         }), 500
 
-@api_bp.route('/municipios', methods=['GET'])
+@routes_graph.route('/municipios', methods=['GET'])
 def get_municipios():
     """Obtiene todos los municipios"""
     try:
@@ -75,7 +75,7 @@ def get_municipios():
             'error': str(e)
         }), 500
 
-@api_bp.route('/grafo', methods=['GET'])
+@routes_graph.route('/grafo', methods=['GET'])
 def get_grafo():
     """Obtiene el grafo completo"""
     try:
@@ -90,7 +90,7 @@ def get_grafo():
             'error': str(e)
         }), 500
 
-@api_bp.route('/buscar-ruta', methods=['POST'])
+@routes_graph.route('/buscar-ruta', methods=['POST'])
 def buscar_ruta():
     """
     Busca ruta entre dos municipios

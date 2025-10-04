@@ -1,12 +1,12 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from routes import api_bp
+from routes.graph import routes_graph 
 
 app = Flask(__name__)
 CORS(app)
 
 # Registrar rutas
-app.register_blueprint(api_bp)
+app.register_blueprint(routes_graph)
 
 @app.route('/')
 def index():
