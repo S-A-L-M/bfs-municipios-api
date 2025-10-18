@@ -1,73 +1,65 @@
+from collections import deque
+
 class GraphService:
     def __init__(self):
-        self.grafo = {}
-    
-    def crear_grafo(self, conexiones):
-        """Crea el grafo con las conexiones proporcionadas"""
-        self.grafo = {}
-        for origen, destino in conexiones:
-            if origen not in self.grafo:
-                self.grafo[origen] = []
-            if destino not in self.grafo:
-                self.grafo[destino] = []
-            
-            self.grafo[origen].append(destino)
-            self.grafo[destino].append(origen)  # Si es bidireccional
-        
-        return {
-            'success': True,
-            'message': 'Grafo creado exitosamente',
-            'municipios': len(self.grafo)
+        self.graph = {
+            'Barranquilla': ['Soledad', 'Puerto Colombia', 'Galapa'],
+            'Soledad': ['Barranquilla', 'Malambo', 'Sabanagrande'],
+            'Santo Tomas': ['Sabanagrande', 'Palmar'],
+            'Palmar': ['Santo Tomas', 'Sabanagrande'],
+            'Baranoa': ['Sabanagrande', 'Galapa'],
+            'Puerto Colombia': ['Barranquilla'],
+            'Sabanagrande': ['Soledad', 'Santo Tomas', 'Palmar', 'Baranoa'],
+            'Malambo': ['Soledad', 'Galapa'],
+            'Galapa': ['Barranquilla', 'Malambo', 'Baranoa']
         }
     
     def obtener_municipios(self):
-        """Retorna la lista de municipios"""
-        return list(self.grafo.keys())
+        return sorted(self.graph.keys())
     
     def obtener_grafo(self):
-        """Retorna el grafo completo"""
-        return self.grafo
+        return self.graph
     
     def buscar_ruta_bfs(self, origen, destino):
-        """Busca la ruta más corta usando BFS"""
-        if origen not in self.grafo or destino not in self.grafo:
-            return {
-                'success': False,
-                'error': 'Municipio no encontrado en el grafo'
-            }
+        if origen not in self.graph or destino not in self.graph:
+            return {'success': False, 'error': 'Municipio no encontrado'}
         
         if origen == destino:
             return {
                 'success': True,
                 'ruta': [origen],
-                'distancia': 0
+                'distancia': 0,
+                'visitados': [origen]
             }
         
-        # BFS
+        cola = deque([(origen, [origen])])
         visitados = {origen}
-        cola = [(origen, [origen])]
+        orden = [origen]
         
         while cola:
-            actual, ruta = cola.pop(0)
+            actual, camino = cola.popleft()
             
-            for vecino in self.grafo[actual]:
+            for vecino in self.graph[actual]:
                 if vecino not in visitados:
-                    nueva_ruta = ruta + [vecino]
+                    visitados.add(vecino)
+                    orden.append(vecino)
+                    nuevo_camino = camino + [vecino]
                     
                     if vecino == destino:
                         return {
                             'success': True,
-                            'ruta': nueva_ruta,
-                            'distancia': len(nueva_ruta) - 1
+                            'ruta': nuevo_camino,
+                            'distancia': len(nuevo_camino) - 1,
+                            'visitados': orden,
+                            'mensaje': ' → '.join(nuevo_camino)
                         }
                     
-                    visitados.add(vecino)
-                    cola.append((vecino, nueva_ruta))
+                    cola.append((vecino, nuevo_camino))
         
         return {
             'success': False,
-            'error': 'No hay ruta entre los municipios'
+            'error': 'No existe ruta',
+            'visitados': orden
         }
 
-# Instancia única
 graph_service = GraphService()
